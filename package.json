@@ -1,0 +1,31 @@
+{
+  "name": "comp2537_assignment1",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IsaacK23/comp2537_assignment1.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/IsaacK23/comp2537_assignment1/issues"
+  },
+  "homepage": "https://github.com/IsaacK23/comp2537_assignment1#readme",
+  "description": "",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "connect-mongo": "^5.1.0",
+    "dotenv": "^16.5.0",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "express-session": "^1.18.1",
+    "joi": "^17.13.3",
+    "mongoose": "^8.14.1"
+  }
+}
