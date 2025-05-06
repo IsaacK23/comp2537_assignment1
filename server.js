@@ -100,7 +100,7 @@ app.post('/login', async (req, res) => {
 
 app.get('/members', (req, res) => {
   if (!req.session.user) return res.redirect('/');
-  const images = ['img1.jpg', 'img2.jpg', 'img3.jpg'];
+  const images = ['duck.jpg', 'minecraft_house.jpg', 'snowmen.jpg'];
   const randomImage = images[Math.floor(Math.random() * images.length)];
   res.render('members', { user: req.session.user, image: randomImage });
 });
