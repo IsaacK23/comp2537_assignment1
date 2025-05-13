@@ -1,0 +1,10 @@
+<%- include('templates/header', { user: user }) %>
+
+<h2>Admin Panel</h2>
+<ol>
+  <% users.forEach(user => { %>
+    <%- include('templates/user', { user }) %>
+  <% }) %>
+</ol>
+
+<%- include('templates/footer') %>

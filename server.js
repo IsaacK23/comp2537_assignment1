@@ -6,11 +6,12 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const Joi = require('joi');
 const path = require('path');
+const { requireLogin, requireAdmin } = require('./middleware');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
-// Build MongoDB connection string manually using .env parts
+// Build MongoDB connection string using .env parts
 const dbUrl = `mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PASSWORD}@${process.env.MONGODB_HOST}/${process.env.MONGODB_DATABASE}`;
 
 mongoose.connect(dbUrl, {
@@ -42,7 +43,12 @@ app.set('view engine', 'ejs');
 const userSchema = new mongoose.Schema({
   name: String,
   email: String,
-  password: String
+  password: String,
+  user_type: {
+    type: String,
+    enum: ['user', 'admin'],
+    default: 'user'
+  }
 });
 const User = mongoose.model('User', userSchema);
 
@@ -52,7 +58,22 @@ app.get('/', (req, res) => {
 });
 
 app.get('/signup', (req, res) => {
-  res.render('signup', { error: null });
+  res.render('signup', { user: req.session.user, error: null });
+});
+
+app.get('/admin', requireAdmin, async (req, res) => {
+  const users = await User.find().lean();
+  res.render('admin', { users, user: req.session.user });
+});
+
+app.post('/admin/promote/:id', requireAdmin, async (req, res) => {
+  await User.updateOne({ _id: new mongoose.Types.ObjectId(req.params.id) }, { $set: { user_type: 'admin' } });
+  res.redirect('/admin');
+});
+
+app.post('/admin/demote/:id', requireAdmin, async (req, res) => {
+  await User.updateOne({ _id: new mongoose.Types.ObjectId(req.params.id) }, { $set: { user_type: 'user' } });
+  res.redirect('/admin');
 });
 
 app.post('/signup', async (req, res) => {
@@ -64,18 +85,25 @@ app.post('/signup', async (req, res) => {
 
   const result = schema.validate(req.body);
   if (result.error) {
-    return res.render('signup', { error: result.error.details[0].message });
+    return res.render('signup', { 
+      user: null,
+      error: result.error.details[0].message 
+    });
   }
 
   const hashedPassword = await bcrypt.hash(req.body.password, 10);
   await User.create({ ...req.body, password: hashedPassword });
 
-  req.session.user = { name: req.body.name, email: req.body.email };
+  req.session.user = { 
+    name: req.body.name, 
+    email: req.body.email, 
+    user_type: 'user' 
+  };
   res.redirect('/members');
 });
 
 app.get('/login', (req, res) => {
-  res.render('login', { error: null });
+  res.render('login', { user: null, error: null });
 });
 
 app.post('/login', async (req, res) => {
@@ -91,18 +119,24 @@ app.post('/login', async (req, res) => {
 
   const user = await User.findOne({ email: req.body.email });
   if (!user || !(await bcrypt.compare(req.body.password, user.password))) {
-    return res.render('login', { error: 'Invalid email or password' });
+    return res.render('login', { user: null, error: 'Invalid email or password' });
   }
 
-  req.session.user = { name: user.name, email: user.email };
+  req.session.user = { 
+    name: user.name, 
+    email: user.email, 
+    user_type: user.user_type
+  };
   res.redirect('/members');
 });
 
 app.get('/members', (req, res) => {
   if (!req.session.user) return res.redirect('/');
-  const images = ['duck.jpg', 'minecraft_house.jpg', 'snowmen.jpg'];
-  const randomImage = images[Math.floor(Math.random() * images.length)];
-  res.render('members', { user: req.session.user, image: randomImage });
+  const images = ['img/duck.jpg', 'img/minecraft_house.jpg', 'img/snowmen.jpg'];
+  res.render('members', {
+    user: req.session.user,
+    images 
+  });
 });
 
 app.get('/logout', (req, res) => {

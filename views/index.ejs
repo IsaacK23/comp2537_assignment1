@@ -1,9 +1,15 @@
-<h1>Welcome to the Site</h1>
-<% if (!user) { %>
-  <a href="/signup">Sign Up</a>
-  <a href="/login">Log In</a>
-<% } else { %>
-  <p>Hello, <%= user.name %>!</p>
-  <a href="/members">Members Area</a>
-  <a href="/logout">Log Out</a>
-<% } %>
+<%- include('templates/header', { user: user }) %>
+
+<div class="container flex-grow-1">
+  <h1>Welcome to the Home Page</h1>
+  <% if (!user) { %>
+    <a href="/signup" class="btn btn-primary me-2">Sign Up</a>
+    <a href="/login" class="btn btn-outline-secondary">Log In</a>
+  <% } else { %>
+    <p>Hello, <%= user.name %>!</p>
+    <a href="/members" class="btn btn-success me-2">Members Area</a>
+    <a href="/logout" class="btn btn-danger">Log Out</a>
+  <% } %>
+</div>
+
+<%- include('templates/footer') %>

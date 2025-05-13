@@ -1,8 +1,23 @@
-<h1>Log In</h1>
-<form action="/login" method="POST">
-  Email: <input name="email" required><br>
-  Password: <input type="password" name="password" required><br>
-  <button type="submit">Log In</button>
+<%- include('templates/header', { user: user }) %>
+
+<h2>Login</h2>
+
+<form method="POST" action="/login">
+  <div class="form-group mb-3">
+    <label for="email">Email address</label>
+    <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" required>
+  </div>
+
+  <div class="form-group mb-3">
+    <label for="password">Password</label>
+    <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+  </div>
+
+  <% if (error) { %>
+    <div class="alert alert-danger"><%= error %></div>
+  <% } %>
+
+  <button type="submit" class="btn btn-primary">Log In</button>
 </form>
-<% if (error) { %><p><%= error %></p><% } %>
-<a href="/login">Try Again</a>
+
+<%- include('templates/footer') %>
