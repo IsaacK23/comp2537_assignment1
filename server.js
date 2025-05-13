@@ -146,7 +146,7 @@ app.get('/logout', (req, res) => {
 });
 
 app.use((req, res) => {
-  res.status(404).render('404');
+  res.status(404).render('404', { user: req.session.user });
 });
 
 app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
